@@ -14,8 +14,10 @@ server.listen(port, () => {
 //pingInterval sends ping every 10 seconds to make sure client still connected - necessary if client loses connection to internet
 const io = socket(server, {pingInterval: 10000});
 
-//Enables CORS for socket.io for specified url with * port
-io.origins('https://www.4scorechat.com:*');
+//Enables CORS for socket.io for specified client urls with * port
+//urls are separated by a space; * means any port
+io.origins('https://www.4scorechat.com:* http://localhost:*');
+
 
 //Global variables to store socket data for all online users
 const chatQueue = []; // array of sockets waiting to chat
