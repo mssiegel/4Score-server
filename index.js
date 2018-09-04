@@ -15,7 +15,7 @@ server.listen(port, () => {
 const io = socket(server, {pingInterval: 10000});
 
 //Enables CORS for socket.io for specified origin url
-io.origins('https://www.4scorechat.com/');
+io.origins('https://www.4scorechat.com');
 
 //Global variables to store socket data for all online users
 const chatQueue = []; // array of sockets waiting to chat
