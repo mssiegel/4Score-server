@@ -1,7 +1,7 @@
+//App setup
 const express = require('express');
 const socket = require('socket.io');
 
-//App setup
 const app = express();
 const server = require('http').Server(app);
 
