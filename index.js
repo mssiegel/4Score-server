@@ -26,13 +26,17 @@ const allUsers = {}; // map socket.id => socket
 
 
 io.on('connection', socket => {
-
   //Handle new person entering chatQueue
   socket.on('enter chatQueue', userName => {
     names[socket.id] = userName;
     allUsers[socket.id] = socket;
     //check if someone is in queue
     findPeerForLoneSocket();
+  });
+
+  //Handle person clicking button to leave chatQueue
+  socket.on('leave chatQueue', () => {
+    removeSocketFromChatQueue(socket);
   });
 
   //Handle new chat message
@@ -53,13 +57,12 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     endChat();
     //remove socket from queue; necessary when socket joined queue then disconnects before pairing
-    const socketIndex = chatQueue.indexOf(socket);
-    if(socketIndex !== -1) chatQueue.splice(socketIndex, 1);
+    removeSocketFromChatQueue(socket);
 
     //delete socket data from our objects
     delete names[socket.id];
-    delete rooms[socket.id];
     delete allUsers[socket.id];
+    //note: rooms[socket.id] already deleted in endChat()
   });
 
 
@@ -94,8 +97,14 @@ io.on('connection', socket => {
       socketAndPeerIDs.forEach(socketID => {
         const curSocket = allUsers[socketID];
         if(curSocket) curSocket.leave(room);
+        delete rooms[socketID];
       });
     }
+  }
+
+  function removeSocketFromChatQueue(socket){
+    const socketIndex = chatQueue.indexOf(socket);
+    if(socketIndex !== -1) chatQueue.splice(socketIndex, 1);
   }
 
 });
