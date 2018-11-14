@@ -9,21 +9,18 @@ const port = process.env.PORT || 4000;
 server.listen(port, () => console.log(`listening to requests on port ${port}`));
 
 //Socket setup
-//pingInterval sends ping every 10 seconds to make sure client is still connected - necessary if client loses connection to internet
-const io = socket(server, {pingInterval: 10000});
+//pingInterval sends ping every 20 seconds to make sure client is still connected - necessary if client loses connection to internet
+const io = socket(server, {pingInterval: 20000});
 
 //Enables CORS for socket.io from specified client urls with * port
 //urls are separated by a space; * means any port
 io.origins('https://www.4scorechat.com:* http://localhost:*');
-
 
 //Global variables to store socket data for all online users
 const chatQueue = []; // array of sockets waiting to chat
 const rooms = {}; // map socket.id => room
 const names = {}; // map socket.id => userName
 const allUsers = {}; // map socket.id => socket
-
-
 
 io.on('connection', socket => {
   //Handle new person entering chatQueue
@@ -89,7 +86,7 @@ io.on('connection', socket => {
 
   function endChat(){
     const room = rooms[socket.id];
-    //room may not exist if client lost internet during a chat and later reconnected as a brand new socket
+    //room may not exist if client loses internet, clicks end chat, and later reconnects after the chat was already ended by the other person
     //upon connecting the new socket will emit 'chat end' yet will obviously not have a room
     if(room) {
       socket.to(room).emit('chat end');

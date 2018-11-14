@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devstart": "nodemon index",
-    "start": "node index"
+    "start": "nodemon index"
   },
   "author": "Moshe Siegel",
   "license": "UNLICENSED",
