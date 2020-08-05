@@ -22,7 +22,7 @@ module.exports = function setupSocketIO(server) {
       names[socket.id] = userName
       allUsers[socket.id] = socket
       //check if someone is in queue
-      findPeerForLoneSocket()
+      findPeerForLoneSocket(userName)
     })
 
     //Handle person clicking button to leave chatQueue
@@ -58,7 +58,7 @@ module.exports = function setupSocketIO(server) {
 
     //SOCKET HELPER FUNCTIONS
 
-    function findPeerForLoneSocket() {
+    function findPeerForLoneSocket(userName) {
       if (chatQueue.length) {
         // somebody is in queue, pair them!
         const peer = chatQueue.pop()
@@ -78,7 +78,7 @@ module.exports = function setupSocketIO(server) {
 
         // Notify admin to hop onto website and chat with lone user
         const clientUrl = socket.handshake.headers.origin
-        if (!clientUrl.includes('localhost')) notifyAdmin()
+        if (!clientUrl.includes('localhost')) notifyAdmin(userName)
       }
     }
 
