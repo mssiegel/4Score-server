@@ -10,6 +10,14 @@ module.exports = function setupSocketIO(server) {
   //urls are separated by a space; * means any port
   io.origins('https://www.4scorechat.com:* http://localhost:*')
 
+  const cherryPie = io.of('cherryPie')
+
+  cherryPie.on('connection', socket => {
+    socket.on('chat message', msg => {
+      socket.broadcast.emit('chat message', msg)
+    })
+  })
+
   //Global variables to store socket data for all online users
   const chatQueue = [] // array of sockets waiting to chat
   const rooms = {} // map socket.id => room
