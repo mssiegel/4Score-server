@@ -5,16 +5,10 @@ const p = new Push({
   token: process.env.PUSHOVER_TOKEN,
 })
 
-function notifyAdmin(userName) {
-  const msg = {
-    // These values correspond to the parameters detailed on https://pushover.net/api
-    // 'message' is required. All other values are optional.
-    message: `"${userName}" entered chat queue`,
-    url: 'https://www.4scorechat.com/chatroom/',
-    url_title: 'Visit chatroom',
-  }
+function notifyAdmin(message) {
+  // message is an object whose values correspond to the parameters at https://pushover.net/api
 
-  p.send(msg, function (err, result) {
+  p.send(message, function (err, result) {
     if (err) throw err
 
     console.log(result)

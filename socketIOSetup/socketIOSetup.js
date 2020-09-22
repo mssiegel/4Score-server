@@ -67,6 +67,8 @@ module.exports = function setupSocketIO(server) {
     //SOCKET HELPER FUNCTIONS
 
     function findPeerForLoneSocket(userName) {
+      const clientUrl = socket.handshake.headers.origin
+
       if (chatQueue.length) {
         // somebody is in queue, pair them!
         const peer = chatQueue.pop()
@@ -78,15 +80,25 @@ module.exports = function setupSocketIO(server) {
         rooms[peer.id] = room
         rooms[socket.id] = room
         // exchange names between the two of them and start the chat
-        peer.emit('chat start', names[socket.id])
+        peer.emit('chat start', userName)
         socket.emit('chat start', names[peer.id])
+
+        // Notify admin that a chat has started
+        const message = {
+          message: `Chat started: "${userName}" and "${names[peer.id]}"`
+        }
+        if (!clientUrl.includes('localhost')) notifyAdmin(message)
       } else {
         // queue is empty, add our lone socket
         chatQueue.unshift(socket)
 
-        // Notify admin to hop onto website and chat with lone user
-        const clientUrl = socket.handshake.headers.origin
-        if (!clientUrl.includes('localhost')) notifyAdmin(userName)
+        // Notify admin that a lone user has entered the chat queue
+        const message = {
+          message: `"${userName}" entered chat queue`,
+          url: 'https://www.4scorechat.com/chatroom/',
+          url_title: 'Visit chatroom'
+        }
+        if (!clientUrl.includes('localhost')) notifyAdmin(message)
       }
     }
 
