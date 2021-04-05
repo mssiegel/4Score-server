@@ -10,21 +10,58 @@ module.exports = function setupSocketIO(server) {
   //urls are separated by a space; * means any port
   io.origins('https://www.4scorechat.com:* http://localhost:*')
 
-  const cherryPie = io.of('cherryPie')
-
-  cherryPie.on('connection', socket => {
-    socket.on('chat message', msg => {
-      socket.broadcast.emit('chat message', msg)
-    })
-  })
-
   //Global variables to store socket data for all online users
   const chatQueue = [] // array of sockets waiting to chat
   const rooms = {} // map socket.id => room
-  const names = {} // map socket.id => userName
+  const names = {} // map socket.id => userName (character)
   const allUsers = {} // map socket.id => socket
 
+  const privateRooms = {} // map socket.id => room
+  const privateNames = {} // map socket.id => userName (real)
+
+  const privateIO = io.of('/private')
+  privateIO.on('connection', socket => {
+    // PRIVATE ROOM EVENTS
+
+    socket.on('enter private room', user => {
+      console.log('user', user)
+      privateRooms[socket.id] = user.roomId
+      privateNames[socket.id] = user.realName
+      socket.join(user.roomId)
+      socket.to(user.roomId).emit('user entered', user.realName)
+    })
+
+    socket.on('private chat message', message => {
+      socket.to(message.roomId).emit('private chat message', message)
+      console.log('private message', message)
+      console.log(privateNames)
+    })
+
+    // Handle someone is typing a new chat message
+    socket.on('typing', username => {
+      const privateRoom = privateRooms[socket.id]
+      socket.to(privateRoom).emit('typing', username)
+    })
+
+    socket.on('disconnect', () => {
+      console.log('DISCONNECT')
+      console.log(privateNames)
+      if (privateNames[socket.id]) {
+        const privateRoom = privateRooms[socket.id]
+        if (privateRoom) {
+          const nameOfLeaver = privateNames[socket.id]
+          socket.to(privateRoom).emit('user left', nameOfLeaver)
+        }
+
+        delete privateNames[socket.id]
+        delete privateRooms[socket.id]
+      }
+    })
+  })
+
   io.on('connection', socket => {
+    // REGULAR CHATROOM EVENTS
+
     //Handle new person entering chatQueue
     socket.on('enter chatQueue', userName => {
       names[socket.id] = userName
@@ -85,7 +122,7 @@ module.exports = function setupSocketIO(server) {
 
         // Notify admin that a chat has started
         const message = {
-          message: `Chat started: "${userName}" and "${names[peer.id]}"`
+          message: `Chat started: "${userName}" and "${names[peer.id]}"`,
         }
         if (!clientUrl.includes('localhost')) notifyAdmin(message)
       } else {
@@ -96,7 +133,7 @@ module.exports = function setupSocketIO(server) {
         const message = {
           message: `"${userName}" entered chat queue`,
           url: 'https://www.4scorechat.com/chatroom/',
-          url_title: 'Visit chatroom'
+          url_title: 'Visit chatroom',
         }
         if (!clientUrl.includes('localhost')) notifyAdmin(message)
       }
