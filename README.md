@@ -18,7 +18,7 @@
 ## Setup instructions
 
 1. `npm install`
-2. `npm run start`
+2. `npm run dev`
 3. Download the [frontend repo](https://github.com/mssiegel/4Score-client) and run it separately
 
 ## Frontend repo
