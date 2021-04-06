@@ -23,6 +23,7 @@ module.exports = function setupSocketIO(server) {
   privateIO.on('connection', socket => {
     // PRIVATE ROOM EVENTS
 
+    // A new person enters a private room
     socket.on('enter private room', user => {
       privateRooms[socket.id] = user.roomId
       privateNames[socket.id] = user.realName
@@ -30,11 +31,13 @@ module.exports = function setupSocketIO(server) {
       socket.to(user.roomId).emit('user entered', user.realName)
     })
 
+    // New chat message received
     socket.on('private chat message', message => {
-      socket.to(message.roomId).emit('private chat message', message)
+      const privateRoom = privateRooms[socket.id]
+      socket.to(privateRoom).emit('private chat message', message)
     })
 
-    // Handle someone is typing a new chat message
+    // Someone is typing a new chat message
     socket.on('typing', username => {
       const privateRoom = privateRooms[socket.id]
       socket.to(privateRoom).emit('typing', username)
@@ -44,8 +47,8 @@ module.exports = function setupSocketIO(server) {
       if (privateNames[socket.id]) {
         const privateRoom = privateRooms[socket.id]
         if (privateRoom) {
-          const nameOfLeaver = privateNames[socket.id]
-          socket.to(privateRoom).emit('user left', nameOfLeaver)
+          const username = privateNames[socket.id]
+          socket.to(privateRoom).emit('user left', username)
         }
 
         delete privateNames[socket.id]
