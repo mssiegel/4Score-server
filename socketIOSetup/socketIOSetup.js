@@ -24,7 +24,6 @@ module.exports = function setupSocketIO(server) {
     // PRIVATE ROOM EVENTS
 
     socket.on('enter private room', user => {
-      console.log('user', user)
       privateRooms[socket.id] = user.roomId
       privateNames[socket.id] = user.realName
       socket.join(user.roomId)
@@ -33,8 +32,6 @@ module.exports = function setupSocketIO(server) {
 
     socket.on('private chat message', message => {
       socket.to(message.roomId).emit('private chat message', message)
-      console.log('private message', message)
-      console.log(privateNames)
     })
 
     // Handle someone is typing a new chat message
@@ -44,8 +41,6 @@ module.exports = function setupSocketIO(server) {
     })
 
     socket.on('disconnect', () => {
-      console.log('DISCONNECT')
-      console.log(privateNames)
       if (privateNames[socket.id]) {
         const privateRoom = privateRooms[socket.id]
         if (privateRoom) {
