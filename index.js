@@ -10,9 +10,9 @@ const setupSocketIO = require('./socketIOSetup/socketIOSetup')
 
 const app = express()
 app.use(helmet())
-const server = http.Server(app)
+const server = http.createServer(app)
+
+setupSocketIO(server)
 
 const port = process.env.PORT || 4000
 server.listen(port, () => console.log(`listening to requests on port ${port}`))
-
-setupSocketIO(server)

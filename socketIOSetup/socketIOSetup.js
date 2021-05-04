@@ -3,12 +3,11 @@ const socket = require('socket.io')
 const notifyAdmin = require('./notifications')
 
 module.exports = function setupSocketIO(server) {
-  //pingInterval sends ping every 20 seconds to make sure client is still connected - necessary if client loses connection to internet
-  const io = socket(server, { pingInterval: 20000 })
-
-  //Enables CORS for socket.io from specified client urls with * port
-  //urls are separated by a space; * means any port
-  io.origins('https://www.4scorechat.com:* http://localhost:*')
+  const io = socket(server, {
+    cors: {
+      origin: ['https://www.4scorechat.com', 'http://localhost:8000'],
+    },
+  })
 
   //Global variables to store socket data for all online users
   const chatQueue = [] // array of sockets waiting to chat
