@@ -121,7 +121,8 @@ module.exports = function setupSocketIO(server) {
         const message = {
           message: `Chat started: "${userName}" and "${names[peer.id]}"`,
         }
-        if (!clientUrl.includes('localhost')) notifyAdmin(message)
+        // Disabling notify admin as 4score is now in maintenance mode
+        // if (!clientUrl.includes('localhost')) notifyAdmin(message)
       } else {
         // queue is empty, add our lone socket
         chatQueue.unshift(socket)
@@ -132,7 +133,8 @@ module.exports = function setupSocketIO(server) {
           url: 'https://www.4scorechat.com/chatroom/',
           url_title: 'Visit chatroom',
         }
-        if (!clientUrl.includes('localhost')) notifyAdmin(message)
+        // Disabling notify admin as 4score is now in maintenance mode
+        // if (!clientUrl.includes('localhost')) notifyAdmin(message)
       }
     }
 
